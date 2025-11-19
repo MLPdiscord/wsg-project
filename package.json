@@ -12,12 +12,16 @@
     },
     "license": "ISC",
     "author": "",
-    "type": "commonjs",
+    "type": "module",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "nodemon index.js"
     },
     "dependencies": {
-        "express": "^5.1.0"
+        "bootstrap": "^5.3.8",
+        "ejs": "^3.1.10",
+        "express": "^5.1.0",
+        "mysql": "^2.18.1",
+        "nodemon": "^3.1.11"
     }
 }
