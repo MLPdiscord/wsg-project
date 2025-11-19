@@ -1,3 +1,4 @@
+# GROUP nr. 3
 # How to run this project
 1. git clone https://github.com/MLPdiscord/wsg-project.git
 2. npm i
