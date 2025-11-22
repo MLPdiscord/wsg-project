@@ -33,4 +33,16 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/admin", (req, res) => {
+    res.render("admin.ejs");
+});
+
+app.get("/manager", (req, res) => {
+    res.render("manager.ejs");
+});
+
+app.get("/user", (req, res) => {
+    res.render("user.ejs");
+});
+
 app.listen(3000);
