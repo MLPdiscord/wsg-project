@@ -4,3 +4,4 @@
 2. npm i
 3. Open phpMyAdmin and run file 'test_database.sql'
 4. npm run dev
+5. go to localhost:3000
