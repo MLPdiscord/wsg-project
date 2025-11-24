@@ -1,12 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USER</title>
+    <title>USER – Widok użytkownika</title>
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+
+    <style>
+        body {
+            background-color: #f7f7f7;
+        }
+        .nav-link.active {
+            font-weight: bold;
+        }
+        .card {
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+    </style>
 </head>
+
 <body>
-    "Widok użytkownika"
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">USER PANEL</a>
+            <button class="btn btn-outline-light" onclick="alert('Wylogowano (symulacja)')">Wyloguj</button>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <h2 class="mb-4">Widok użytkownika</h2>
+
+        <!-- LISTA BUDYNKÓW -->
+        <h4>Wybierz budynek</h4>
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <div class="card p-3" onclick="alert('Budynek A wybrany')">
+                    <h5>Budynek A</h5>
+                    <p>Adres: ul. Przykładowa 12</p>
+                    <button class="btn btn-primary w-100">Otwórz</button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-3" onclick="alert('Budynek B wybrany')">
+                    <h5>Budynek B</h5>
+                    <p>Adres: ul. Słoneczna 5</p>
+                    <button class="btn btn-primary w-100">Otwórz</button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-3" onclick="alert('Budynek C wybrany')">
+                    <h5>Budynek C</h5>
+                    <p>Adres: ul. Akademicka 1</p>
+                    <button class="btn btn-primary w-100">Otwórz</button>
+                </div>
+            </div>
+
+        </div>
+
+        <hr class="my-5">
+
+        <!-- LISTA PIĘTER -->
+        <h4>Piętra budynku</h4>
+
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                Parter
+                <button class="btn btn-outline-primary btn-sm" onclick="alert('Wybrano: Parter')">Zobacz</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                Piętro 1
+                <button class="btn btn-outline-primary btn-sm" onclick="alert('Wybrano: Piętro 1')">Zobacz</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                Piętro 2
+                <button class="btn btn-outline-primary btn-sm" onclick="alert('Wybrano: Piętro 2')">Zobacz</button>
+            </li>
+        </ul>
+
+        <hr class="my-5">
+
+        <!-- LISTA POKOI -->
+        <h4>Pokoje na piętrze</h4>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="card p-2" onclick="alert('Pokój 101 – wybrano')">
+                    <h6>Pokój 101</h6>
+                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-2" onclick="alert('Pokój 102 – wybrano')">
+                    <h6>Pokój 102</h6>
+                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-2" onclick="alert('Pokój 203 – wybrano')">
+                    <h6>Pokój 203</h6>
+                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-2" onclick="alert('Pokój 305 – wybrano')">
+                    <h6>Pokój 305</h6>
+                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </body>
 </html>
