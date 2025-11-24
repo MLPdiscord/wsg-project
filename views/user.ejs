@@ -4,21 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USER – Widok użytkownika</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
 
     <style>
-        body {
-            background-color: #f7f7f7;
-        }
-        .nav-link.active {
+        body { background-color: #f4f4f4; }
+        .card { cursor: pointer; transition: 0.2s; }
+        .card:hover { transform: scale(1.02); }
+        .floor-header { cursor: pointer; }
+        .arrow {
+            font-size: 20px;
             font-weight: bold;
-        }
-        .card {
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .card:hover {
-            transform: scale(1.02);
+            width: 25px;
+            text-align: center;
+            transition: transform 0.2s;
         }
     </style>
 </head>
@@ -26,9 +24,9 @@
 <body>
 
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">USER PANEL</a>
+            <span class="navbar-brand">USER PANEL</span>
             <button class="btn btn-outline-light" onclick="alert('Wylogowano (symulacja)')">Wyloguj</button>
         </div>
     </nav>
@@ -37,9 +35,9 @@
 
         <h2 class="mb-4">Widok użytkownika</h2>
 
-        <!-- LISTA BUDYNKÓW -->
+        <!-- BLOK WYBIERZ BUDYNEK -->
         <h4>Wybierz budynek</h4>
-        <div class="row g-3">
+        <div class="row g-3 mb-5">
 
             <div class="col-md-4">
                 <div class="card p-3" onclick="alert('Budynek A wybrany')">
@@ -67,62 +65,146 @@
 
         </div>
 
-        <hr class="my-5">
 
-        <!-- LISTA PIĘTER -->
+        <!-- PIĘTRA BUDYNKU -->
+
         <h4>Piętra budynku</h4>
 
         <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                Parter
-                <button class="btn btn-outline-primary btn-sm" onclick="alert('Wybrano: Parter')">Zobacz</button>
+
+            <!-- PIĘTRO 0 -->
+            <li class="list-group-item">
+                <div class="floor-header d-flex justify-content-between align-items-center"
+                     onclick="toggleFloor('floor0', 'arr0')">
+
+                    <strong>Parter</strong>
+                    <span id="arr0" class="arrow">&gt;</span>
+                </div>
+
+                <div id="floor0" class="mt-3" style="display: none;">
+                    <h6>Pokoje na piętrze</h6>
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 001 – info')">
+                                <h6>Pokój 001</h6>
+                                <p>Pomieszczenie techniczne</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 002 – info')">
+                                <h6>Pokój 002</h6>
+                                <p>Recepcja</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                Piętro 1
-                <button class="btn btn-outline-primary btn-sm" onclick="alert('Wybrano: Piętro 1')">Zobacz</button>
+
+            <!-- PIĘTRO 1 -->
+            <li class="list-group-item">
+                <div class="floor-header d-flex justify-content-between align-items-center"
+                     onclick="toggleFloor('floor1', 'arr1')">
+
+                    <strong>Piętro 1</strong>
+                    <span id="arr1" class="arrow">&gt;</span>
+                </div>
+
+                <div id="floor1" class="mt-3" style="display: none;">
+                    <h6>Pokoje na piętrze</h6>
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 101 – info')">
+                                <h6>Pokój 101</h6>
+                                <p>Biuro pracowników</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 102 – info')">
+                                <h6>Pokój 102</h6>
+                                <p>Magazyn dokumentów</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 103 – info')">
+                                <h6>Pokój 103</h6>
+                                <p>Gabinet kierownika</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                Piętro 2
-                <button class="btn btn-outline-primary btn-sm" onclick="alert('Wybrano: Piętro 2')">Zobacz</button>
+
+            <!-- PIĘTRO 2 -->
+            <li class="list-group-item">
+                <div class="floor-header d-flex justify-content-between align-items-center"
+                     onclick="toggleFloor('floor2', 'arr2')">
+
+                    <strong>Piętro 2</strong>
+                    <span id="arr2" class="arrow">&gt;</span>
+                </div>
+
+                <div id="floor2" class="mt-3" style="display: none;">
+                    <h6>Pokoje na piętrze</h6>
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 201 – info')">
+                                <h6>Pokój 201</h6>
+                                <p>Sala konferencyjna</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 203 – info')">
+                                <h6>Pokój 203</h6>
+                                <p>Biuro księgowości</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card p-3" onclick="alert('Pokój 205 – info')">
+                                <h6>Pokój 205</h6>
+                                <p>Archiwum</p>
+                                <button class="btn btn-secondary btn-sm w-100">Info</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </li>
+
         </ul>
 
-        <hr class="my-5">
-
-        <!-- LISTA POKOI -->
-        <h4>Pokoje na piętrze</h4>
-
-        <div class="row g-3">
-            <div class="col-md-3">
-                <div class="card p-2" onclick="alert('Pokój 101 – wybrano')">
-                    <h6>Pokój 101</h6>
-                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card p-2" onclick="alert('Pokój 102 – wybrano')">
-                    <h6>Pokój 102</h6>
-                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card p-2" onclick="alert('Pokój 203 – wybrano')">
-                    <h6>Pokój 203</h6>
-                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card p-2" onclick="alert('Pokój 305 – wybrano')">
-                    <h6>Pokój 305</h6>
-                    <button class="btn btn-secondary w-100 btn-sm">Info</button>
-                </div>
-            </div>
-        </div>
-
     </div>
+
+    <script>
+        function toggleFloor(floorId, arrowId) {
+            const content = document.getElementById(floorId);
+            const arrow = document.getElementById(arrowId);
+
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                arrow.textContent = "v";
+            } else {
+                content.style.display = "none";
+                arrow.textContent = ">";
+            }
+        }
+    </script>
 
 </body>
 </html>
