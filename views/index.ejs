@@ -9,25 +9,28 @@
 <body>
     <div class="container">
         <h1>If you are reading this, the server works</h1>
-        <table class="table table-striped">
-            <tr>
-                <% for (const key in array[0]) { %>
-                    <th scope="col">
-                        <%= key %>
-                    </th>
-                <% } %>
-            </tr>
-            
-            <% array.forEach(element => { %>
+
+        <% for (const array of tables) { %>
+            <table class="table table-striped">
                 <tr>
-                    <% for (const key in element) { %>
-                        <td>
-                            <%= element[key] %>
-                        </td>
+                    <% for (const key in array[0]) { %>
+                        <th scope="col">
+                            <%= key %>
+                        </th>
                     <% } %>
                 </tr>
-            <% }) %>
-        </table>
+                
+                <% array.forEach(element => { %>
+                    <tr>
+                        <% for (const key in element) { %>
+                            <td>
+                                <%= element[key] %>
+                            </td>
+                        <% } %>
+                    </tr>
+                <% }) %>
+            </table>
+        <% } %>
 
         <p><a href="admin">Test admin view</a></p>
         <p></p><a href="manager">Test manager view</a></p>
