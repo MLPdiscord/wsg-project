@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 02, 2025 at 06:43 PM
+-- Generation Time: Dec 02, 2025 at 06:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,19 @@ SET time_zone = "+00:00";
 --
 -- Database: `wsg_project`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `beacons`
+--
+
+CREATE TABLE `beacons` (
+  `id` int(11) NOT NULL,
+  `floor_id` int(11) NOT NULL,
+  `beacon_id` int(11) NOT NULL,
+  `localisation` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -65,6 +78,18 @@ CREATE TABLE `rooms` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sensors`
+--
+
+CREATE TABLE `sensors` (
+  `id` int(11) NOT NULL,
+  `floor_id` int(11) NOT NULL,
+  `localisation` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -93,6 +118,13 @@ CREATE TABLE `users_buildings` (
 --
 
 --
+-- Indexes for table `beacons`
+--
+ALTER TABLE `beacons`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `floor_id` (`floor_id`);
+
+--
 -- Indexes for table `buildings`
 --
 ALTER TABLE `buildings`
@@ -109,6 +141,13 @@ ALTER TABLE `floors`
 -- Indexes for table `rooms`
 --
 ALTER TABLE `rooms`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `floor_id` (`floor_id`);
+
+--
+-- Indexes for table `sensors`
+--
+ALTER TABLE `sensors`
   ADD PRIMARY KEY (`id`),
   ADD KEY `floor_id` (`floor_id`);
 
@@ -130,6 +169,12 @@ ALTER TABLE `users_buildings`
 --
 
 --
+-- AUTO_INCREMENT for table `beacons`
+--
+ALTER TABLE `beacons`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `buildings`
 --
 ALTER TABLE `buildings`
@@ -148,6 +193,12 @@ ALTER TABLE `rooms`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `sensors`
+--
+ALTER TABLE `sensors`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -156,6 +207,12 @@ ALTER TABLE `users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `beacons`
+--
+ALTER TABLE `beacons`
+  ADD CONSTRAINT `beacons_ibfk_1` FOREIGN KEY (`floor_id`) REFERENCES `floors` (`id`);
 
 --
 -- Constraints for table `floors`
@@ -168,6 +225,12 @@ ALTER TABLE `floors`
 --
 ALTER TABLE `rooms`
   ADD CONSTRAINT `rooms_ibfk_1` FOREIGN KEY (`floor_id`) REFERENCES `floors` (`id`);
+
+--
+-- Constraints for table `sensors`
+--
+ALTER TABLE `sensors`
+  ADD CONSTRAINT `sensors_ibfk_1` FOREIGN KEY (`floor_id`) REFERENCES `floors` (`id`);
 
 --
 -- Constraints for table `users_buildings`
