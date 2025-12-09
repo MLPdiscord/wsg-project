@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie | System Zarządzania Budynkiem</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <h2 class="text-center mb-4">Logowanie</h2>
+        <h6 class="text-center mb-4 text-muted">System Zarządzania Obiektem</h6>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form method="POST" action="/login">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    required
+                    placeholder="wpisz adres email"
+                >
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Hasło (Password)</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    required
+                    placeholder="wpisz hasło"
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-3">Zaloguj</button>
+        </form>
+
+    </div>
+    
+</body>
+</html>

@@ -11,14 +11,14 @@ class Database {
         });
     }
 
-    #query(query) {
+    #query(sql, params) {
         return new Promise((resolve, reject) =>
             this.pool.getConnection((err, connection) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                connection.query(query, (err, result) => {
+                connection.query(sql, params, (err, result) => {
                     connection.release();
                     if (err) {
                         reject(err);
@@ -27,6 +27,10 @@ class Database {
                     resolve(result);
                 })
             }));
+    }
+
+    async query (sql, params = []) {
+        return await this.#query(sql, params);
     }
 
     async selectAllFrom(table) {

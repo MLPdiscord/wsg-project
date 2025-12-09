@@ -110,7 +110,7 @@ CREATE TABLE `users` (
 CREATE TABLE `users_buildings` (
   `user_id` int(11) NOT NULL,
   `building_id` int(11) NOT NULL,
-  `user_role` enum('user','manager') NOT NULL
+  `user_role` enum('user','manager', 'admin') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

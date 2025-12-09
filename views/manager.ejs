@@ -1,12 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MANAGER</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <title>MANAGER – Widok Zarządcy</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <style>
+        body { background-color: #f4f4f4; }
+        .card { cursor: pointer; transition: 0.2s; }
+        .card:hover { transform: scale(1.02); }
+        .floor-header { cursor: pointer; }
+        .arrow {
+            font-size: 20px;
+            font-weight: bold;
+            width: 25px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+    </style>
 </head>
+
 <body>
-    "Widok zarządcy"
+
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">PANEL ZARZĄDCY</span>
+            <button class="btn btn-ouline-light" onclick="window.location.href='/logout'">Wuloguj</button>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+
+        <h2 class="mb-4">Zarządzanie Budynkami (Zarządca)</h2>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Budynki, do których masz dostęp</h4>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addBuildingModal">
+                + Dodaj Nowy Budynek
+            </button>
+        </div>
+
+        <div class="row g-3 mb-5">
+
+            <% if (typeof buildings !== 'undefined' && buildings.length > 0) { %>
+                <% buildings.forEach(function(building) { %>
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                            <h5><%= building.name %></h5>
+                            <p>Adres: <%= building.address %></p>
+                            <a href="/manager/building/<%= building.id %>/manage" class="btn btn-warning w-100">
+                                Zarządzaj
+                            </a>
+                        </div>
+                    </div>    
+                <% }); %>
+            <% } else { %>
+                <p>Brak przypisanych budynków. <a href="/manager/buildings/add">Dodaj Nowy</a>.</p>
+            <%} %>                         
+        </div>
+
+    <script>
+        function toggleFloor(floorId, arrowId) {
+            const content = document.getElementById(floorId);
+            const arrow = document.getElementById(arrowId);
+
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                arrow.textContent = "v";
+            } else {
+                content.style.display = "none";
+                arrow.textContent = ">";
+            }
+        }
+    </script>
+
+    <div class="modal fade" id="addBuildingModal" tabindex="-1" aria-labelledby="addBuildingModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="/manager/buildings/add">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBuildingModalLabel">Dodaj Nowy Budynek</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nazwa Budynku</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                    
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Adres Budynku</label>
+                            <input type="text" class="form-control" id="address" name="address" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Opis (Opcjonalnie)</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                        <button type="submit" class="btn btn-success">Dodaj Budynek</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
