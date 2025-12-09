@@ -1,16 +1,11 @@
 import express from "express";
-import session from 'express-session';
-import { Database } from "./database.js";
-import mainRouter from './server.js';
+import session from "express-session";
+import mainRouter from "./server.js";
+import generateData from "./generate_data.js";
+
+generateData();
 
 const app = express();
-const db = new Database({
-    connectionLimit:10,
-    host: "Localhost",
-    user: "root",
-    password: "",
-    database: "wsg_project"
-});
 
 app.set("view engine", "ejs");
 
