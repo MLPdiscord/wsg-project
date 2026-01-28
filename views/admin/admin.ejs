@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>ADMIN - Panel Sterowania</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f4f4f4; }
+        .card { transition: 0.2s; border-left: 5px solid #007bff; }
+        .card:hover { transform: scale(1.01); box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+        .admin-section-header { border-bottom: 2px solid #343a40; margin-bottom: 20px; padding-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">ADMIN PANEL GŁÓWNA</span>
+            <a href="/logout" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right"></i> Wyloguj</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Zarządzanie Systemem</h2>
+
+        <div class="d-flex justify-content-between align-items-center admin-section-header">
+            <h4>Zarządzanie budynkami</h4>
+            <a href="/admin/buildings/add" class="btn btn-success btn-sm">+ Dodaj Budynek</a>
+        </div>
+
+        <div class="row g-3 mb-5">
+    <% if (buildings && buildings.length > 0) { %>
+        <% buildings.forEach(building => { %>
+            <div class="col-md-6 col-lg-4">
+                <div class="card p-3 mb-3 h-100 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div style="max-width: 70%;">
+                            <h5 class="mb-1 text-truncate" title="<%= building.name %>">
+                                <i class="bi bi-buildings-fill text-success"></i><%= building.name %>
+                            </h5>
+                            <div class="text-muted small">
+                                <i class="bi bi-geo-alt"></i> <%= building.address %>
+                            </div>
+
+                            <% if (building.description) { %>
+                                <div class="small mt-2 test-secondary" style="line-height: 1.4;">
+                                    <%= building.description %>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <div class="d-flex flex-column align-items-end gap-1">
+                            <span class="badge <%= building.status === 'active' ? 'bg-success' : 'bg-secondary' %>" style="font-size: 0.7rem; min-width: 85px;">
+                                <i class="bi <%= building.status === 'active' ? 'bi-check-circle' : 'bi-archive' %>"></i>
+                                <%= building.status === 'active' ? 'Aktywny' : 'Zarchiwizowany' %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="btn-group w-100 mt-auto">
+                        <a href="/admin/buildings/edit?id=<%= building.id %>" class="btn btn-warning btn-sm d-flex align-items-center justify-content-center">
+                            <i class="bi bi-pencil-square me-1"></i> Edytuj
+                        </a>
+
+                        <a href="/admin/buildings/toggle-status/<%= building.id %>/<%= building.status %>"
+                            class="btn <%= building.status === 'active' ? 'btn-outline-secondary' : 'btn-outline-success' %> btn-sm d-flex align-items-center justify-content-center">
+                            <% if (building.status === 'active') { %>
+                                <i class="bi bi-archive me-1"></i> Archiwizuj
+                            <% } else { %>
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Przywróć
+                            <% } %>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                Brak zarejestrowanych budynków w bazie danych.
+            </div>
+        </div>
+    <% } %>
+</div>
+    <div>
+        <div class="d-flex justify-content-between align-items-center admin-section-header">
+            <h4>Zarządzanie użytkownikami</h4>
+            <a href="/users_list/new" class="btn btn-success btn-sm">+ Dodaj Użytkownika</a>
+        </div>
+
+        <div class="row g-3">
+            <% if (users && users.length > 0) { %>
+                <% users.forEach(u => { %>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                 <div>
+                                    <strong><i class="bi bi-people-fill text-primary"></i><%= u.name %> <%= u.surname %></strong>
+                                    <div class="text-muted small"><%= u.email %></div>
+                                </div>
+        
+                                <div class="d-flex flex-column align-items-end gap-1">
+                                    <span class="badge bg-primary" style="font-size: 0.7rem;">
+                                        <%= u.role.toUpperCase() %>
+                                    </span>
+                                    <span class="badge <%= u.status === 'active' ? 'bg-success' : 'bg-danger' %>" style="font-size: 0.7rem;">
+                                         <%= u.status === 'active' ? 'Aktywny' : 'Zablokowany' %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="btn-group w-100 mt-2">
+                                <a href="/users_list/edit?id=<%= u.id %>" 
+                                    class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil-square me-1"></i>Edytuj
+                                </a>
+        
+                                <a href="/users/toggle-status/<%= u.id %>/<%= u.status %>" 
+                                    class="btn <%= u.status === 'active' ? 'btn-outline-danger' : 'btn-outline-success' %> btn-sm">
+                                    <% if (u.status === 'active') { %>
+                                        <i class="bi bi-archive me-1"></i> Zablokuj
+                                    <% } else { %>
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i> Odblokuj
+                                    <% } %>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>Brak zarejestrowanych użytkowników.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="card border-info mb-3">
+    <div class="card-body">
+        <h5 class="card-title text-info"><i class="bi bi-eye"></i> Tryb Podglądu</h5>
+        <p class="card-text">Przeglądaj domyślne i piętro jako zarządca, bez uprawnień do edycji.</p>
+        <a href="/manager?viewAs=admin" class="btn btn-primary">
+            <i class="bi bi-eye"></i> Podgląd budynków (Tryb Admina)
+        </a>
+    </div>
+</div>
+</body>
+</html>

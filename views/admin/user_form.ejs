@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %> – System Zarządzania</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <style>
+        body { background-color: #f4f4f4; }
+        .form-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid #007bff; }
+        .tag-badge { font-size: 0.9rem; padding: 8px 12px; border-radius: 50px; }
+        .tag-close { border-left: 1px solid rgba(255,255,255,0.3); margin-left: 8px; cursor: pointer; text-decoration: none; color:white; }
+        .tag-close:hover { color: #ffcccc; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">ADMIN PANEL – Użytkownicy</span>
+            <a href="/admin" class="btn btn-outline-light">Powrót</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-card">
+                    <h3 class="mb-4 text-center"><%= title %></h3>
+                    
+                    <form action="<%= isNew ? '/users_list/new' : '/users_list/edit' %>" method="POST">
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+                        <% if (!isNew && user) { %>
+                            <input type="hidden" name="id" value="<%= user.id %>">
+                        <% } %>
+
+                        <label class="form-label">Imię</label>
+                        <input type="text" 
+                            name="name" 
+                            class="form-control mb-3" 
+                            value="<%= user ? user.name : '' %>" 
+                            required>
+    
+                        <label class="form-label">Nazwisko</label>
+                        <input type="text" 
+                            name="surname" 
+                            class="form-control mb-3" 
+                            value="<%= user ? user.surname : '' %>" 
+                            required>
+    
+                        <label class="form-label">Email</label>
+                        <input type="email" 
+                            name="email" 
+                            class="form-control mb-3" 
+                            value="<%= user ? user.email : '' %>" 
+                            required>
+
+                        <% if (isNew) { %>
+                            <label class="form-label">Hasło</label>
+                            <input type="password" 
+                                name="password" 
+                                class="form-control mb-3" 
+                                required>
+                        <% } %>
+
+                        <label class="form-label">Rola w systemie</label>
+                        <select name="role" class="form-select mb-4">
+                            <option value="user" <%= (user && user.role === 'user') ? 'selected' : '' %>>
+                                Użytkownik
+                            </option>
+                            <option value="manager" <%= (user && user.role === 'manager') ? 'selected' : '' %>>
+                                Zarządca budynku
+                            </option>
+                            <option value="admin" <%= (user && user.role === 'admin') ? 'selected' : '' %>>
+                                Administrator
+                            </option>
+                        </select>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success w-100">
+                                <%= isNew ? 'Stwórz konto' : 'Zapisz zmiany' %>
+                            </button>
+
+                            <% if (!isNew && user) { %>
+                                <a href="#"
+                                   class="btn btn-danger w-100"
+                                   onclick="confirmDelete(event, '/users/delete/<%= user.id %>', 'Czy na pewno chcesz trwale usunąć konto użytkownika <%= user.name %>?')">
+                                    Usuń konto
+                                </a>
+                            <% } %>
+                        </div>
+                    </form>
+
+                    <% if (!isNew && user && user.role === 'manager') { %>
+                        <hr class="my-4">
+                        <div class="manager-section">
+                            <h5 class="mb-3">Zarządzane budynki</h5>
+
+                            <div class="d-flex flex-wrap gap-2 mb-4">
+                                <% if (managedBuildings && managedBuildings.length > 0) { %>
+                                    <% managedBuildings.forEach(b => { %>
+                                        <div class="badge bg-primary d-flex align-items-center tag-badge">
+                                            <span><%= b.name %></span>
+                                            <a href="#"
+                                               class="tag-close"
+                                               onclick="confirmDelete(event, '/admin/users/detach_building/<%= user.id %>/<%= b.id %>', 'Czy na pewno chcesz odłączyć ten budynek?')">&times;</a>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <p class="text-muted small italic">Ten menedżer nie ma jeszcze przypisanych budynków.</p>
+                                <% } %>
+                            </div>
+
+                            <form action="/admin/users/assign_building" method="POST" class="bg-light p-3 rounded shadow-sm">
+                                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                <label class="form-label small fw-bold">Przypisz nowy budynek:</label>
+                                <input type="hidden" name="userId" value="<%= user.id %>">
+                                <div class="input-group">
+                                    <select name="buildingId" class="form-select form-select-sm" required>
+                                        <option value="" selected disabled>Wybierz budynek...</option>
+                                        <% allBuildings.forEach(b => { %>
+                                            <option value="<%= b.id %>"><%= b.name %></option>
+                                        <% }) %>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm">Dodaj</button>
+                                </div>
+                            </form>
+                        </div>
+                    <% } %>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete(event, url, message) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Jesteś pewen?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Tak, usuń!',
+                cancelButtonText: 'Anuluj'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        }
+    </script>
+</body>
+</html>
