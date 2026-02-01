@@ -23,34 +23,36 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `beacons`
---
 
-CREATE TABLE `beacons` (
+CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `floor_id` int(11) NOT NULL,
-  `beacon_id` int(11) NOT NULL,
-  `localisation` varchar(255) NOT NULL
+  `name` varchar(64) NOT NULL,
+  `surname` varchar(64) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `role` enum('user', 'manager', 'admin') NOT NULL,
+  `status` enum('active', 'blocked') DEFAULT 'active',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `buildings`
---
 
 CREATE TABLE `buildings` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `address` varchar(255) NOT NULL
+  `address` varchar(255) NOT NULL,
+  `description` varchar(255) NULL,
+  `status` ENUM('active', 'archived') DEFAULT 'active',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `floors`
---
+CREATE TABLE `manager_buildings` (
+  `id` int(11) AUTO_INCREMENT PRIMARY KEY,
+  `user_id` int(11) NOT NULL,
+  `building_id` int(11) NOT NULL,
+  `assigned_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`building_id`) REFERENCES `buildings`(`id`) ON DELETE CASCADE,
+  UNIQUE KEY `user_building_unique` (`user_id`, `building_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `floors` (
   `id` int(11) NOT NULL,
@@ -61,12 +63,6 @@ CREATE TABLE `floors` (
   `barriers` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `rooms`
---
-
 CREATE TABLE `rooms` (
   `id` int(11) NOT NULL,
   `floor_id` int(11) NOT NULL,
@@ -75,33 +71,18 @@ CREATE TABLE `rooms` (
   `corridor_order` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `sensors`
---
+CREATE TABLE `beacons` (
+  `id` int(11) NOT NULL,
+  `floor_id` int(11) NOT NULL,
+  `beacon_id` int(11) NOT NULL,
+  `localisation` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `sensors` (
   `id` int(11) NOT NULL,
   `floor_id` int(11) NOT NULL,
   `localisation` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  `surname` varchar(64) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `users_buildings`
@@ -112,6 +93,8 @@ CREATE TABLE `users_buildings` (
   `building_id` int(11) NOT NULL,
   `user_role` enum('user','manager', 'admin') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
 
 --
 -- Indexes for dumped tables
@@ -127,9 +110,6 @@ ALTER TABLE `beacons`
 --
 -- Indexes for table `buildings`
 --
-ALTER TABLE `buildings`
-  ADD PRIMARY KEY (`id`);
-
 --
 -- Indexes for table `floors`
 --
@@ -154,9 +134,6 @@ ALTER TABLE `sensors`
 --
 -- Indexes for table `users`
 --
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
-
 --
 -- Indexes for table `users_buildings`
 --
@@ -243,3 +220,4 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
