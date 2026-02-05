@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Dodaj Budynek – Admin</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <style>
+        body { background-color: #f4f4f4; }
+        .form-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid #28a745; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">ADMIN PANEL – Budynki</span>
+            <a href="/admin" class="btn btn-outline-light">Powrót</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-card">
+                    <h3 class="mb-4 text-center"><%= isNew ? 'Dodaj nowy budynek' : 'Edytuj budynek' %></h3>
+                    
+                    <form action="<%= isNew ? '/admin/buildings/add' : '/admin/buildings/edit' %>" method="POST">
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                        <% if (!isNew && building) { %> 
+                            <input type="hidden" name="id" value="<%= building.id %>">
+                        <% } %>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nazwa budynku</label>
+                            <input type="text" name="name" class="form-control"
+                                   value="<%= !isNew ? building.name : '' %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Adres</label>
+                            <input type="text" name="address" class="form-control"
+                                   value="<%= !isNew ? building.address : '' %>" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Opis budynku (opcjonalnie)</label>
+                            <textarea name="description" class="form-control" rows="3"><%= !isNew ? building.description : '' %></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success w-100">
+                                <%= isNew ? 'Stwórz budynek' : 'Zapisz zmiany' %>
+                            </button>
+
+                            <% if (!isNew && building) { %>
+                                <a href="#"
+                                   class="btn btn-danger w-100"
+                                   onclick="confirmDelete(event, '/admin/buildings/delete/<%= building.id %>', 'Czy na pewno chcesz usunąć budynek <%= building.name %>?')">
+                                   Usuń
+                                </a>
+                            <% } else { %>
+                                <a href="/admin" class="btn btn-secondary w-100">Anuluj</a>
+                            <% } %>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete(event, url, message) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Jesteś pewen?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Tak, usuń!',
+                cancelButtonText: 'Anuluj'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        }
+    </script>
+</body>
+</html>

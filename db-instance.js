@@ -5,7 +5,8 @@ const dbConfig = {
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'wsg_project'
+    database: 'wsg_project',
+    autocommit: true
 }
 
 const database = new Database(dbConfig);

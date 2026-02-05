@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Piętro <%= floor.number %> - <%= floor.building_name %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-light">
+    <% if (userRole === 'admin') { %>
+        <div class="bg-info text-white text-center py-1 shadow-sm">
+            <i class="bi bi-eye me-2"></i> Admin mode
+        </div>
+    <% } %>
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-bold"><i class="bi bi-buildings-fill text-success"></i> <%= floor.building_name %> | Piętro <%= floor.number %></span>
+            <a href="/buildings/building/<%= floor.building_id %>" class="btn btn-outline-light btn-sm"><i class="bi bi-arrow-left-circle"></i> Powrót</a>
+        </div>
+    </nav>
+
+    <div class="card mb-3 shadow-sm border-0 bg-white" style="max-width: 350px; position: sticky; top: 10px; z-index: 1000; margin-left: 15px; margin-top: 20px;">
+        <div class="card-body d-flex align-items-center p-2">
+            <div class="flex-shrink-0">
+                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                    <i class="bi bi-person-badge fs-4"></i>
+                </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+                <h6 class="mb-0 fw-bold"><%= currentUser.name %> <%= currentUser.surname %></h6>
+                <small class="text-muted" style="font-size: 0.75rem;">
+                    <i class="bi bi-envelope me-1"></i><%= currentUser.email %>
+                </small>
+            </div>
+            <div class="ms-2">
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill text-capitalize" style="font-size: 0.65rem;"><%= currentUser.role %></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-gear-fill me-2"></i>Ustawienia Piętra</h5>
+                        <% if (userRole === 'admin' || userRole === 'manager') { %>
+                        <form action="/buildings/floor/<%= floor.id %>/update" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Opis piętra</label>
+                                <textarea name="description" class="form-control" rows="2"><%= floor.description %></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Bariery architektoniczne</label>
+                                <input type="text" name="barriers" class="form-control" value="<%= floor.barriers %>" placeholder="np. brak windy">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Dodatkowe uwagi</label>
+                                <textarea name="notes" class="form-control" rows="3"><%= floor.notes %></textarea>
+                            </div>
+                            <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                <button type="submit" class="btn btn-primary w-100">Zapisz zmiany</button>
+                            <% } %>
+                        </form>
+                        <% } else { %>
+                            <div class="mb-4">
+                                <label class="text-muted small uppercase fw-bold d-block mb-1">Opis</label>
+                                <p class="text-dark bg-light p-3 rounded-3" style="min-height: 80px;">
+                                    <%= floor.description || 'Brak opisu' %>
+                                </p>
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="text-muted small uppercase fw-bold d-block mb-1">Bariery</label>
+                                <span class="badge <%= floor.barriers ? 'bg-warning text-dark' : 'bg-success' %> p-2">
+                                    <i class="bi <%= floor.barriers ? 'bi-exclamation-triangle' : 'bi-check-circle' %> me-1"></i>
+                                    <%= floor.barriers || 'Brak barier' %>
+                                </span>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-door-open-fill me-2 text-primary"></i>Pomieszczenia</h5>
+                        <% if (userRole === 'admin' || userRole === 'manager') { %>
+                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+                                <i class="bi bi-plus-circle"></i> Dodaj pokój
+                            </button>
+                        <% } %>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                        <th style="width:25%;">Numer/Nazwa</th>
+                                        <th style="width:10%;">Kolejność</th>
+                                        <th style="width:50%;">Opis</th>
+                                        <th style="width:15%;">Opcje</th>
+                                    <% } else { %>
+                                        <th style="width:25%;">Numer/Nazwa</th>
+                                        <th style="width:10%;">Kolejność</th>
+                                        <th style="width:65%;">Opis</th>
+                                    <% } %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if(rooms.length > 0) { %>
+                                    <% rooms.forEach(room => { %>
+                                        <tr>
+                                            <td class="fw-bold text-break" style="max-width: 200px;"><%= room.name %></td>
+                                            <td><%= room.corridor_order %></td>
+                                            <td class="text-muted small text-break"><%= room.description %></td>
+                                            <td>
+                                                <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                                <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editRoomModal<%= room.id %>"><i class="bi bi-gear"></i></button>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="4" class="text-center py-4 text-muted">Brak zarejestrowanych pomieszczeń.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-broadcast me-2 text-info"></i>Beacony i Urządzenia</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small">Przegląd i edycja czujników na tym piętrze.</p>
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h3><i class="bi bi-cpu"></i> Czujniki na piętrze</h3>
+                                    <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSensorModal">
+                                        <i class="bi bi-plus-circle"></i> Dodaj czuynik
+                                    </button>
+                                    <% } %>
+                                </div>
+        
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <table class="table table-hover">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                                        <th>ID</th>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>Localisation</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    <% } else { %>
+                                                        <th>ID</th>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>Localisation</th>
+                                                        <th>Status</th> 
+                                                    <% } %>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (sensors && sensors.length > 0) { %>
+                                                    <% sensors.forEach(sensor => { %>
+                                                        <tr>
+                                                            <td><%= sensor.id %></td>
+                                                            <td><strong><%= sensor.name %></strong></td>
+                                                            <td><span class="badge bg-info text-dark"><%= sensor.type %></span></td>
+                                                            <td><%= sensor.localisation %></td>
+                                                            <td>
+                                                                <span class="badge <%= sensor.status === 'active' ? 'bg-success' : 'bg-secondary' %>">
+                                                                    <%= sensor.status %>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                                                <button class="btn btn-sm btn-danger" onclick="deleteSensor('<%= sensor.id %>', '<%= sensor.name %>')">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                                <% } %>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted">There is no czuynik yet.</td>
+                                                    </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0"><i class="bi bi-bluetooth text-primary"></i> Beacony</h5>
+                            <% if (userRole === 'admin' || userRole === 'manager') { %>
+                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addBeaconModal">
+                                + Dodaj Beacon
+                            </button>
+                            <% } %>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                            <th>ID Urządzenia</th>
+                                            <th>Lokalizacja (opis)</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Akcje</th>
+                                        <% } else { %> 
+                                            <th>ID Urządzenia</th>
+                                            <th>Lokalizacja (opis)</th>
+                                            <th>Status</th>
+                                        <% } %> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (beacons && beacons.length > 0) { %>
+                                        <% beacons.forEach(beacon => { %>
+                                            <tr>
+                                                <td><code><%= beacon.beacon_id %></code></td>
+                                                <td><%= beacon.localisation %></td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td class="text-end">
+                                                    <form action="/buildings/beacons/delete/<%= beacon.id %>" method="POST" class="delete-beacon-form" style="display:inline;">
+                                                        <input type="hidden" name="floor_id" value="<%= floor.id %>">
+                                                        <% if (userRole === 'admin' || userRole === 'manager') { %>
+                                                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="beaconDelete(this)">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                        <% } %>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr><td colspan="3" class="text-center text-muted py-3">Beacony nie zostały jeszcze zainstalowane.</td></tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="addRoomModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="/buildings/floor/<%= floor.id %>/add-room" method="POST" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nowe Pomieszczenie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Numer lub Nazwa (np. 101, Sekretariat)</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Opis (np. Sala konferencyjna)</label>
+                        <input type="text" name="description" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kolejność w korytarzu</label>
+                        <input type="number" name="corridor_order" class="form-control" value="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Zapisz zmiany</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <% rooms.forEach(room => { %>
+    <div class="modal fade" id="editRoomModal<%= room.id %>" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/buildings/room/<%= room.id %>/update" method="POST">
+                    <div class="modal-header bg-light">
+                        <h5 class="modal-title fw-bold">Ustawienia Piętra: <%= room.name %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="floor_id" value="<%= floor.id %>">
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nazwa pomieszczenia</label>
+                            <input type="text" name="name" class="form-control" value="<%= room.name %>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Opis</label>
+                            <input type="text" name="description" class="form-control" value="<%= room.description %>">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Kolejność w korytarzu</label>
+                            <input type="number" name="corridor_order" class="form-control" value="<%= room.corridor_order %>">
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button"
+                                class="btn btn-danger btn-delete-room"
+                                data-id="<%= room.id %>"
+                                data-floor="<%= floor.id %>"
+                                data-name="<%= room.name %>">
+                            <i class="bi bi-trash"></i> Usuń
+                        </button>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <% }) %>
+
+    <div class="modal fade" id="addSensorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/buildings/sensors/add" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">New Detector</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="floor_id" value="<%= floor.id %>">
+                    
+                        <div class="mb-3">
+                            <label class="form-label">Detector name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Np.: Czujnik dymu Kuchnia" required>
+                        </div>
+                    
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-control" required>
+                                <option value="Temperature">Termometre</option>
+                                <option value="Smoke">Smoke Detector</option>
+                                <option value="Water">Flood datchik</option>
+                                <option value="Motion">Motion detector</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Location (opis)</label>
+                            <input type="text" name="localisation" class="form-control" placeholder="Na przykład: Przy oknie, pokój 101" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abort</button>
+                        <button type="submit" class="btn btn-success">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addBeaconModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="/buildings/beacons/add" method="POST" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nowy Beacon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="floor_id" value="<%= floor.id %>">
+                
+                    <div class="mb-3">
+                        <label class="form-label">Beacon ID (UUID/Name)</label>
+                        <input type="text" name="beacon_id" class="form-control" placeholder="Na przykład: BEAC_01_A" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Opis lokalizacji</label>
+                        <input type="text" name="localisation" class="form-control" placeholder="Na przykład: W pobliżu wejścia głównego" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.querySelectorAll('.btn-delete-room').forEach(button => {
+    button.addEventListener('click', function() {
+        const roomId = this.getAttribute('data-id');
+        const floorId = this.getAttribute('data-floor');
+        const roomName = this.getAttribute('data-name');
+
+        Swal.fire({
+            title: 'Delete room?',
+            text: `This action cannot be undone!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete!',
+            cancelButtonText: 'Abort'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/buildings/room/${roomId}/delete?floor_id=${floorId}`;
+            }
+        });
+    });
+});
+</script>
+
+<script>
+function deleteSensor(id, name) {
+    Swal.fire({
+        title: 'Delete alarm?',
+        text: `This action cannot be undone!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete!',
+        cancelButtonText: 'Abort'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/buildings/sensors/delete/${id}?floor_id=<%= floor.id %>`;
+        }
+    });
+}
+</script>
+
+<script>
+    function beaconDelete(button) {
+    const form = button.closest('.delete-beacon-form');
+
+    Swal.fire({
+        title: 'Delete beacon?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete!',
+        cancelButtonText: 'Abort',
+        background: '#fff',
+        borderRadius: '15px'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
+}
+</script>
+</body>
+</html>

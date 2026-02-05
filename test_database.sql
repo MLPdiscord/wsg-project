@@ -23,49 +23,46 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `beacons`
---
 
-CREATE TABLE `beacons` (
-  `id` int(11) NOT NULL,
-  `floor_id` int(11) NOT NULL,
-  `beacon_id` int(11) NOT NULL,
-  `localisation` varchar(255) NOT NULL
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `surname` varchar(64) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `role` enum('user', 'manager', 'admin') NOT NULL,
+  `status` enum('active', 'blocked') DEFAULT 'active',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `buildings`
---
 
 CREATE TABLE `buildings` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `address` varchar(255) NOT NULL
+  `address` varchar(255) NOT NULL,
+  `description` varchar(255) NULL,
+  `status` ENUM('active', 'archived') DEFAULT 'active',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `floors`
---
+CREATE TABLE `manager_buildings` (
+  `id` int(11) AUTO_INCREMENT PRIMARY KEY,
+  `user_id` int(11) NOT NULL,
+  `building_id` int(11) NOT NULL,
+  `assigned_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`building_id`) REFERENCES `buildings`(`id`) ON DELETE CASCADE,
+  UNIQUE KEY `user_building_unique` (`user_id`, `building_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `floors` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `building_id` int(11) NOT NULL,
   `number` int(11) NOT NULL,
   `description` text DEFAULT NULL,
   `notes` text DEFAULT NULL,
-  `barriers` text DEFAULT NULL
+  `barriers` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `rooms`
---
 
 CREATE TABLE `rooms` (
   `id` int(11) NOT NULL,
@@ -75,47 +72,57 @@ CREATE TABLE `rooms` (
   `corridor_order` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `sensors`
---
-
 CREATE TABLE `sensors` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL,
   `floor_id` int(11) NOT NULL,
-  `localisation` varchar(255) NOT NULL
+  `status` enum('active', 'offline', 'maintenance') DEFAULT 'active',
+  `localisation` varchar(255) NOT NULL, 
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `floor_id` (`floor_id`),
+  CONSTRAINT `sensors_ibfk_1` FOREIGN KEY (`floor_id`) REFERENCES `floors` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+CREATE TABLE `sensor_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sensor_id` int(11) NOT NULL,
+  `previous_status` enum('active', 'offline', 'maintenance'),
+  `new_status` enum('active', 'offline', 'maintenance'),
+  `changed_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`id`) ON DELETE CASCADE
+);
 
---
--- Table structure for table `users`
---
-
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `name` varchar(64) NOT NULL,
-  `surname` varchar(64) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(64) NOT NULL
+CREATE TABLE `sensor_data` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sensor_id` int(11) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `is_critical` TINYINT(1) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_sensor_data_sensors` FOREIGN KEY (`sensor_id`) REFERENCES `sensors` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `users_buildings`
---
+CREATE TABLE `beacons` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `beacon_id` VARCHAR(100) NOT NULL UNIQUE,
+  `floor_id` INT(11) NOT NULL,
+  `localisation` VARCHAR(255) NOT NULL,
+  `status` ENUM('active', 'inactive') DEFAULT 'active',
+  FOREIGN KEY (`floor_id`) REFERENCES `floors`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `users_buildings` (
-  `user_id` int(11) NOT NULL,
-  `building_id` int(11) NOT NULL,
-  `user_role` enum('user','manager', 'admin') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Indexes for dumped tables
---
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `building_id` INT NOT NULL,
+  `user_role` ENUM('manager', 'user') DEFAULT 'user',
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`building_id`) REFERENCES `buildings`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for table `beacons`
@@ -123,13 +130,6 @@ CREATE TABLE `users_buildings` (
 ALTER TABLE `beacons`
   ADD PRIMARY KEY (`id`),
   ADD KEY `floor_id` (`floor_id`);
-
---
--- Indexes for table `buildings`
---
-ALTER TABLE `buildings`
-  ADD PRIMARY KEY (`id`);
-
 --
 -- Indexes for table `floors`
 --
@@ -146,27 +146,7 @@ ALTER TABLE `rooms`
 
 --
 -- Indexes for table `sensors`
---
-ALTER TABLE `sensors`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `floor_id` (`floor_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users_buildings`
---
-ALTER TABLE `users_buildings`
-  ADD KEY `building_id` (`building_id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
+-
 
 --
 -- AUTO_INCREMENT for table `beacons`
@@ -195,8 +175,6 @@ ALTER TABLE `rooms`
 --
 -- AUTO_INCREMENT for table `sensors`
 --
-ALTER TABLE `sensors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -232,14 +210,7 @@ ALTER TABLE `rooms`
 ALTER TABLE `sensors`
   ADD CONSTRAINT `sensors_ibfk_1` FOREIGN KEY (`floor_id`) REFERENCES `floors` (`id`);
 
---
--- Constraints for table `users_buildings`
---
-ALTER TABLE `users_buildings`
-  ADD CONSTRAINT `users_buildings_ibfk_1` FOREIGN KEY (`building_id`) REFERENCES `buildings` (`id`),
-  ADD CONSTRAINT `users_buildings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-COMMIT;
-
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
