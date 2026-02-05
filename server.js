@@ -27,6 +27,23 @@ function isManager(req, res, next) {
     }
 };
 
+async function logAction(req, action, entityType, entityName, details) {
+    try {
+        const sql = `INSERT INTO audit_logs (user_id, user_name, action_type, entity_type, entity_name, details) 
+                     VALUES (?, ?, ?, ?, ?, ?)`;
+        await db.query(sql, [
+            req.session.userId, 
+            req.session.userEmail,
+            action, 
+            entityType, 
+            entityName, 
+            details
+        ]);
+    } catch (err) {
+        console.error("Failed to write audit log:", err);
+    }
+};
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -56,7 +73,20 @@ router.post('/login', async (req, res) => {
 
         if (passwordMatch) {
             if (user.status === 'blocked') {
-                return res.render('login', { error: 'Twoje konto jest zablokowane!' });
+                return res.render('login', { error: 'Twoje konto jest zablokowane!'});
+            }
+            
+            if (user.role !== 'admin' && user.role !== 'manager') {
+                const buildings = await db.selectBuildingsByUserId(user.id);
+                let finalRole = "user";
+
+                for (const building of buildings) {
+                    if (building.user_role === "manager") {
+                        finalRole = "manager";
+                        break;
+                    }
+                }
+                user.role = finalRole;
             }
 
             req.session.userId = user.id;
